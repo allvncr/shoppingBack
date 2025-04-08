@@ -26,7 +26,7 @@ router.post(
 );
 
 // Route pour mettre à jour un hôtel (accessible uniquement aux superAdmin et proprio)
-router.put(
+router.patch(
   "/hotels/:id",
   authenticate,
   checkRole("superAdmin", "proprio"),

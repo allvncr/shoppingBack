@@ -44,12 +44,18 @@ exports.createParking = async (req, res) => {
 // Obtenir la liste des parkings avec filtres
 exports.getParkings = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, startTime, endTime } = req.query;
+    const { name, city, minPrice, maxPrice, startTime, endTime, createdBy } =
+      req.query;
 
     let filter = {};
 
     if (name) {
       filter.name = { $regex: name, $options: "i" };
+    }
+
+    // Si un createdBy est fourni dans les paramètres, filtrer par ce propriétaire
+    if (createdBy) {
+      filter.createdBy = createdBy;
     }
 
     if (city) {

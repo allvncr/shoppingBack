@@ -26,7 +26,7 @@ router.post(
 );
 
 // Route pour mettre à jour une activité (accessible uniquement aux superAdmin et proprio)
-router.put(
+router.patch(
   "/activities/:id",
   authenticate,
   checkRole("superAdmin", "proprio"),
@@ -35,7 +35,7 @@ router.put(
 
 // Route pour supprimer une activité (accessible uniquement aux superAdmin et proprio)
 router.delete(
-  "/activities/:slug",
+  "/activities/:id",
   authenticate,
   checkRole("superAdmin", "proprio"),
   deleteActivity

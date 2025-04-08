@@ -8,12 +8,8 @@ exports.createActivity = async (req, res) => {
     location,
     images,
     contact,
-    duration,
     price,
-    priceDetails,
-    openingHours,
-    amenities,
-    suitableFor,
+    maxParticipants,
   } = req.body;
 
   try {
@@ -22,7 +18,7 @@ exports.createActivity = async (req, res) => {
     }
 
     // Validation supplémentaire
-    if (!name || !description || !location || !contact) {
+    if (!name || !location || !contact) {
       return res
         .status(400)
         .json({ message: "Veuillez remplir tous les champs obligatoires." });
@@ -34,12 +30,8 @@ exports.createActivity = async (req, res) => {
       location,
       images,
       contact,
-      duration,
       price,
-      priceDetails,
-      openingHours,
-      amenities,
-      suitableFor,
+      maxParticipants,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });
 
@@ -56,14 +48,16 @@ exports.createActivity = async (req, res) => {
 // Obtenir la liste des activités avec filtres
 exports.getActivities = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, duration, startTime, endTime } =
-      req.query;
+    const { name, city, minPrice, maxPrice, createdBy } = req.query;
 
-    // Construire le filtre dynamique
     let filter = {};
 
+    if (createdBy) {
+      filter.createdBy = createdBy;
+    }
+
     if (name) {
-      filter.name = { $regex: name, $options: "i" }; // Recherche insensible à la casse
+      filter.name = { $regex: name, $options: "i" };
     }
 
     if (city) {
@@ -76,19 +70,9 @@ exports.getActivities = async (req, res) => {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    if (duration) {
-      filter.duration = duration;
-    }
-
-    if (startTime || endTime) {
-      filter["openingHours.start"] = startTime ? { $lte: startTime } : {};
-      filter["openingHours.end"] = endTime ? { $gte: endTime } : {};
-    }
-
-    // Sélectionner uniquement les champs nécessaires
     const activities = await Activity.find(filter)
-      .select("id name price location slug images") // Limiter les champs retournés
-      .sort({ createdAt: -1 }); // Trier par date de création
+      .sort({ createdAt: -1 })
+      .populate("createdBy");
 
     res.status(200).json({ activities });
   } catch (error) {
@@ -102,13 +86,11 @@ exports.updateActivity = async (req, res) => {
   const updateData = req.body;
 
   try {
-    // Vérifier si l'activité existe
     const activity = await Activity.findById(id);
     if (!activity) {
       return res.status(404).json({ message: "Activité non trouvée." });
     }
 
-    // Vérifier les permissions
     if (
       req.user.role !== "superAdmin" &&
       String(activity.createdBy) !== String(req.user._id)
@@ -118,12 +100,10 @@ exports.updateActivity = async (req, res) => {
       });
     }
 
-    // Supprimer le champ `createdBy` des données mises à jour pour éviter les conflits
     if (updateData.createdBy) {
       delete updateData.createdBy;
     }
 
-    // Mettre à jour les champs
     Object.assign(activity, updateData);
     await activity.save();
 
@@ -138,21 +118,19 @@ exports.updateActivity = async (req, res) => {
 // Suppression d'une activité
 exports.deleteActivity = async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { id } = req.params;
 
-    // Recherche de l'activité par slug
-    const activity = await Activity.findOne({ slug });
+    const activity = await Activity.findById(id);
 
     if (!activity) {
       return res.status(404).json({ message: "Activité non trouvée" });
     }
 
-    // Vérifier si l'utilisateur est un superAdmin ou s'il est le proprio de l'activité
     if (
       req.user.role === "superAdmin" ||
       activity.createdBy.toString() === req.user._id.toString()
     ) {
-      await activity.remove(); // Supprimer l'activité
+      await Activity.findByIdAndDelete(id);
       return res
         .status(200)
         .json({ message: "Activité supprimée avec succès" });
@@ -172,7 +150,6 @@ exports.getActivityBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // Recherche de l'activité par slug
     const activity = await Activity.findOne({ slug }).populate(
       "createdBy",
       "firstname lastname email"

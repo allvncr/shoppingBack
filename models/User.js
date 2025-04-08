@@ -14,6 +14,11 @@ const UserSchema = new mongoose.Schema(
       default: "client", // Rôle par défaut
       required: true,
     },
+    establishmentTypes: {
+      type: [String],
+      enum: ["Hotel", "Restaurant", "Activité", "Parking"], // Types d'établissements modifiables
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -3,16 +3,25 @@ const BaseEstablishment = require("./BaseEstablishment");
 
 // Définir un schéma spécifique pour Parking
 const parkingSchema = new mongoose.Schema({
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  startTime: {
+    type: String,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+  },
+  endTime: {
+    type: String,
+    required: true,
+  },
   pricePerHour: {
     type: Number,
     required: true,
-  },
-  openingHours: {
-    start: { type: String, required: true }, // Format : "08:00"
-    end: { type: String, required: true },   // Format : "22:00"
-  },
-  amenities: {
-    type: [String], // Exemple : ["Sécurité 24h/24", "Paiement mobile"]
   },
 });
 

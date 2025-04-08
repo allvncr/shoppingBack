@@ -5,7 +5,16 @@ require("dotenv").config();
 
 // Inscription
 exports.register = async (req, res) => {
-  const { lastname, firstname, email, tel, password, role } = req.body;
+  const {
+    lastname,
+    firstname,
+    email,
+    tel,
+    password,
+    role,
+    establishmentTypes,
+  } = req.body;
+
   try {
     // Vérifier si l'email est déjà utilisé
     const userExists = await User.findOne({ email });
@@ -21,6 +30,19 @@ exports.register = async (req, res) => {
         .json({ message: "Numéro de téléphone déjà utilisé" });
     }
 
+    // Vérifier que les types d'établissements sont valides si fournis
+    const validTypes = ["Hotel", "Restaurant", "Activité", "Parking"];
+    if (establishmentTypes) {
+      if (
+        !Array.isArray(establishmentTypes) ||
+        !establishmentTypes.every((type) => validTypes.includes(type))
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Types d'établissements invalides" });
+      }
+    }
+
     // Créer le nouvel utilisateur
     const newUser = new User({
       lastname,
@@ -29,10 +51,22 @@ exports.register = async (req, res) => {
       tel,
       password,
       role: role || "client", // Par défaut, le rôle est "client"
+      establishmentTypes: establishmentTypes || [], // Vide par défaut si non fourni
     });
 
     await newUser.save();
-    res.status(201).json({ message: "Utilisateur créé avec succès" });
+    res.status(201).json({
+      message: "Utilisateur créé avec succès",
+      user: {
+        id: newUser._id,
+        lastname: newUser.lastname,
+        firstname: newUser.firstname,
+        email: newUser.email,
+        tel: newUser.tel,
+        role: newUser.role,
+        establishmentTypes: newUser.establishmentTypes,
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur", error: err.message });
   }
@@ -46,6 +80,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({
       email: { $regex: `^${email}$`, $options: "i" },
     });
+
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
@@ -73,6 +108,7 @@ exports.login = async (req, res) => {
         email: user.email,
         tel: user.tel,
         role: user.role,
+        establishmentTypes: user.establishmentTypes || [], // Inclure les types
       },
     });
   } catch (err) {
@@ -129,6 +165,141 @@ exports.updateUserInfo = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Erreur lors de la mise à jour des informations",
+      error: err.message,
+    });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Vérifier si un utilisateur est authentifié
+    if (!req.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    // Vérifier si l'utilisateur est un administrateur
+    if (req.user.role !== "superAdmin") {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    // Récupérer tous les utilisateurs
+    const users = await User.find({});
+
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération des utilisateurs",
+      error: err.message,
+    });
+  }
+};
+
+exports.updateUserByID = async (req, res) => {
+  const { id } = req.params;
+  const { firstname, lastname, email, tel, role, establishmentTypes } =
+    req.body;
+
+  try {
+    // Vérifier si un utilisateur est authentifié
+    if (!req.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    // Vérifier si l'utilisateur est un administrateur
+    if (req.user.role !== "superAdmin") {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    // Trouver l'utilisateur par ID
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Vérifier les doublons (email ou téléphone)
+    if (email && email.toLowerCase() !== user.email) {
+      const emailExists = await User.findOne({ email: email.toLowerCase() });
+      if (emailExists) {
+        return res.status(400).json({ message: "Email déjà utilisé" });
+      }
+    }
+
+    if (tel && tel !== user.tel) {
+      const telExists = await User.findOne({ tel });
+      if (telExists) {
+        return res
+          .status(400)
+          .json({ message: "Numéro de téléphone déjà utilisé" });
+      }
+    }
+
+    // Vérifier que les types d'établissements sont valides si fournis
+    const validTypes = ["Hotel", "Restaurant", "Activité", "Parking"];
+    if (establishmentTypes) {
+      if (
+        !Array.isArray(establishmentTypes) ||
+        !establishmentTypes.every((type) => validTypes.includes(type))
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Types d'établissements invalides" });
+      }
+      user.establishmentTypes = establishmentTypes;
+    }
+
+    // Mettre à jour les autres informations
+    user.firstname = firstname || user.firstname;
+    user.lastname = lastname || user.lastname;
+    user.email = email?.toLowerCase() || user.email;
+    user.tel = tel || user.tel;
+    user.role = role || user.role;
+
+    await user.save(); // Sauvegarder les modifications
+
+    res.status(200).json({
+      message: "Informations mises à jour avec succès",
+      user: {
+        id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        tel: user.tel,
+        role: user.role,
+        establishmentTypes: user.establishmentTypes,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Erreur lors de la mise à jour des informations",
+      error: err.message,
+    });
+  }
+};
+
+exports.deleteUserByID = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Vérifier si un utilisateur est authentifié
+    if (!req.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    // Vérifier si l'utilisateur est un administrateur
+    if (req.user.role !== "superAdmin") {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    // Trouver et supprimer l'utilisateur par ID
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json({ message: "Utilisateur supprimé avec succès" });
+  } catch (err) {
+    res.status(500).json({
+      message: "Erreur lors de la suppression de l'utilisateur",
       error: err.message,
     });
   }

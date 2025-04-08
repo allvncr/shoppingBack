@@ -1,6 +1,6 @@
 const Hotel = require("../models/Hotel");
 
-// Créer un hôtel
+// Créer une maison de vacance
 exports.createHotel = async (req, res) => {
   const {
     name,
@@ -8,10 +8,9 @@ exports.createHotel = async (req, res) => {
     location,
     images,
     contact,
-    roomTypes,
     amenities,
     pricePerNight,
-    openingHours,
+    capacity,
   } = req.body;
 
   try {
@@ -25,17 +24,16 @@ exports.createHotel = async (req, res) => {
       location,
       images,
       contact,
-      roomTypes,
       amenities,
       pricePerNight,
-      openingHours,
-      createdBy: req.user._id, // Associer l'utilisateur connecté
+      capacity,
+      createdBy: req.user._id,
     });
 
     await newHotel.save();
 
     res.status(201).json({
-      message: "Hôtel créé avec succès",
+      message: "Maison de vacance créée avec succès",
       hotel: newHotel,
     });
   } catch (error) {
@@ -43,11 +41,10 @@ exports.createHotel = async (req, res) => {
   }
 };
 
-// Obtenir la liste des hôtels avec filtres
+// Obtenir la liste des maisons de vacances avec filtres
 exports.getHotels = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, roomType, startTime, endTime } =
-      req.query;
+    const { name, city, minPrice, maxPrice, minCapacity } = req.query;
 
     let filter = {};
 
@@ -65,17 +62,12 @@ exports.getHotels = async (req, res) => {
       if (maxPrice) filter.pricePerNight.$lte = Number(maxPrice);
     }
 
-    if (roomType) {
-      filter.roomTypes = { $regex: roomType, $options: "i" };
-    }
-
-    if (startTime || endTime) {
-      filter["openingHours.start"] = startTime ? { $lte: startTime } : {};
-      filter["openingHours.end"] = endTime ? { $gte: endTime } : {};
+    if (minCapacity) {
+      filter.capacity = { $gte: Number(minCapacity) };
     }
 
     const hotels = await Hotel.find(filter)
-      .sort({ createdAt: -1 }) // Trier par date de création
+      .sort({ createdAt: -1 })
       .populate("createdBy", "firstname lastname email");
 
     res.status(200).json({ hotels });
@@ -84,7 +76,7 @@ exports.getHotels = async (req, res) => {
   }
 };
 
-// Obtenir les détails d'un hôtel par SLug
+// Obtenir les détails d'une maison de vacance par slug
 exports.getHotelBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -95,7 +87,7 @@ exports.getHotelBySlug = async (req, res) => {
     );
 
     if (!hotel) {
-      return res.status(404).json({ message: "Hôtel non trouvé" });
+      return res.status(404).json({ message: "Maison de vacance non trouvée" });
     }
 
     res.status(200).json({ hotel });
@@ -104,7 +96,7 @@ exports.getHotelBySlug = async (req, res) => {
   }
 };
 
-// Modifier un hôtel
+// Modifier une maison de vacance
 exports.updateHotel = async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
@@ -113,7 +105,7 @@ exports.updateHotel = async (req, res) => {
     const hotel = await Hotel.findById(id);
 
     if (!hotel) {
-      return res.status(404).json({ message: "Hôtel non trouvé" });
+      return res.status(404).json({ message: "Maison de vacance non trouvée" });
     }
 
     if (
@@ -121,7 +113,7 @@ exports.updateHotel = async (req, res) => {
       req.user.role !== "superAdmin"
     ) {
       return res.status(403).json({
-        message: "Vous n'êtes pas autorisé à modifier cet hôtel.",
+        message: "Vous n'êtes pas autorisé à modifier cet établissement.",
       });
     }
 
@@ -129,7 +121,7 @@ exports.updateHotel = async (req, res) => {
     await hotel.save();
 
     res.status(200).json({
-      message: "Hôtel mis à jour avec succès.",
+      message: "Maison de vacance mise à jour avec succès.",
       hotel,
     });
   } catch (error) {
@@ -137,7 +129,7 @@ exports.updateHotel = async (req, res) => {
   }
 };
 
-// Supprimer un hôtel
+// Supprimer une maison de vacance
 exports.deleteHotel = async (req, res) => {
   const { id } = req.params;
 
@@ -145,7 +137,7 @@ exports.deleteHotel = async (req, res) => {
     const hotel = await Hotel.findById(id);
 
     if (!hotel) {
-      return res.status(404).json({ message: "Hôtel non trouvé" });
+      return res.status(404).json({ message: "Maison de vacance non trouvée" });
     }
 
     if (
@@ -153,14 +145,14 @@ exports.deleteHotel = async (req, res) => {
       req.user.role !== "superAdmin"
     ) {
       return res.status(403).json({
-        message: "Vous n'êtes pas autorisé à supprimer cet hôtel.",
+        message: "Vous n'êtes pas autorisé à supprimer cet établissement.",
       });
     }
 
     await hotel.remove();
 
     res.status(200).json({
-      message: "Hôtel supprimé avec succès.",
+      message: "Maison de vacance supprimée avec succès.",
     });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error.message });

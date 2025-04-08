@@ -26,7 +26,7 @@ router.post(
 );
 
 // Route pour mettre à jour un parking (accessible uniquement aux superAdmin et proprio)
-router.put(
+router.patch(
   "/parkings/:id",
   authenticate,
   checkRole("superAdmin", "proprio"),
