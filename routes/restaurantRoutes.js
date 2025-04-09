@@ -26,7 +26,7 @@ router.post(
 );
 
 // Route pour mettre à jour un restaurant (accessible uniquement aux superAdmin et proprio)
-router.put(
+router.patch(
   "/restaurants/:id",
   authenticate,
   checkRole("superAdmin", "proprio"),

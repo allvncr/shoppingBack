@@ -10,16 +10,6 @@ const restaurantSchema = new mongoose.Schema({
     start: { type: String, required: true }, // Exemple : "08:00"
     end: { type: String, required: true }, // Exemple : "22:00"
   },
-  ratings: {
-    average: {
-      type: Number,
-      default: 0, // Note moyenne
-    },
-    count: {
-      type: Number,
-      default: 0, // Nombre d'avis
-    },
-  },
   amenities: {
     type: [String], // Exemple : ["Wi-Fi", "Terrasse", "Parking"]
     default: [],
