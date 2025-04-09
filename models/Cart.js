@@ -19,13 +19,33 @@ const cartSchema = new mongoose.Schema(
           required: true,
           enum: ["Hotel", "Restaurant", "Activité", "Parking"],
         },
-        reservationDate: {
+        reservationStartDate: {
           type: Date,
           required: true,
+        },
+        reservationStartTime: {
+          type: String,
+          required: false,
+        },
+        reservationEndDate: {
+          type: Date,
+          required: false,
+        },
+        reservationEndTime: {
+          type: String,
+          required: false,
+        },
+        people: {
+          type: Number,
+          required: false,
         },
         price: {
           type: Number,
           required: true,
+        },
+        additionalInfo: {
+          type: String,
+          required: false,
         },
       },
     ],

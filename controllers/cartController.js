@@ -3,8 +3,17 @@ const Cart = require("../models/Cart");
 exports.addToCart = async (req, res) => {
   try {
     const userId = req.user._id; // Récupération de l'ID de l'utilisateur depuis le token
-    const { establishmentId, establishmentType, reservationDate, price } =
-      req.body;
+    const {
+      establishmentId,
+      establishmentType,
+      reservationStartDate,
+      reservationStartTime,
+      reservationEndDate,
+      reservationEndTime,
+      people,
+      price,
+      additionalInfo,
+    } = req.body;
 
     // Vérifier si le panier existe pour cet utilisateur
     let cart = await Cart.findOne({ user: userId });
@@ -21,8 +30,13 @@ exports.addToCart = async (req, res) => {
     cart.items.push({
       establishment: establishmentId,
       establishmentType,
-      reservationDate,
+      reservationStartDate,
+      reservationStartTime,
+      reservationEndDate,
+      reservationEndTime,
+      people,
       price,
+      additionalInfo,
     });
 
     // Sauvegarder le panier
@@ -98,11 +112,9 @@ exports.removeFromCart = async (req, res) => {
       .status(200)
       .json({ message: "Élément retiré du panier avec succès", cart });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la suppression de l'élément",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la suppression de l'élément",
+      error: error.message,
+    });
   }
 };
