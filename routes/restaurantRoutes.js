@@ -5,19 +5,23 @@ const {
   getRestaurantBySlug,
   updateRestaurant,
   deleteRestaurant,
+  addDishToMenu,
+  removeDishFromMenu,
+  updateDishInMenu,
 } = require("../controllers/restaurantController");
+
 const authenticate = require("../middleware/authenticate");
-const checkRole = require("../middleware/checkRole"); // Importer le middleware
+const checkRole = require("../middleware/checkRole");
 
 const router = express.Router();
 
-// Route pour récupérer les restaurants (accessible à tous)
+// Récupérer tous les restaurants
 router.get("/restaurants", getRestaurants);
 
-// Route pour récupérer un restaurant par son ID (accessible à tous)
+// Récupérer un restaurant par son ID ou slug
 router.get("/restaurants/:id", getRestaurantBySlug);
 
-// Route pour créer un restaurant (accessible uniquement aux superAdmin et proprio)
+// Créer un restaurant
 router.post(
   "/restaurants",
   authenticate,
@@ -25,7 +29,7 @@ router.post(
   createRestaurant
 );
 
-// Route pour mettre à jour un restaurant (accessible uniquement aux superAdmin et proprio)
+// Mettre à jour un restaurant
 router.patch(
   "/restaurants/:id",
   authenticate,
@@ -33,12 +37,36 @@ router.patch(
   updateRestaurant
 );
 
-// Route pour supprimer un restaurant (accessible uniquement aux superAdmin et proprio)
+// Supprimer un restaurant
 router.delete(
   "/restaurants/:id",
   authenticate,
   checkRole("superAdmin", "proprio"),
   deleteRestaurant
+);
+
+// Ajouter un plat au menu
+router.post(
+  "/restaurants/:id/menu",
+  authenticate,
+  checkRole("superAdmin", "proprio"),
+  addDishToMenu
+);
+
+// Supprimer un plat du menu
+router.delete(
+  "/restaurants/:id/menu/:dishId",
+  authenticate,
+  checkRole("superAdmin", "proprio"),
+  removeDishFromMenu
+);
+
+// Mettre à jour un plat du menu
+router.patch(
+  "/restaurants/:id/menu/:dishId",
+  authenticate,
+  checkRole("superAdmin", "proprio"),
+  updateDishInMenu
 );
 
 module.exports = router;

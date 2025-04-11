@@ -1,17 +1,36 @@
 const mongoose = require("mongoose");
 const BaseEstablishment = require("./BaseEstablishment");
 
+const DishSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  image: {
+    type: String, // URL de l'image du plat
+    required: false,
+  },
+});
+
 const restaurantSchema = new mongoose.Schema({
   cuisineType: {
-    type: String, // Exemple : "Italienne", "Indienne", "Ivoirienne"
+    type: String,
     required: true,
   },
   openingHours: {
-    start: { type: String, required: true }, // Exemple : "08:00"
-    end: { type: String, required: true }, // Exemple : "22:00"
+    start: { type: String, required: true },
+    end: { type: String, required: true },
   },
   amenities: {
-    type: [String], // Exemple : ["Wi-Fi", "Terrasse", "Parking"]
+    type: [String],
+    default: [],
+  },
+  menu: {
+    type: [DishSchema],
     default: [],
   },
 });

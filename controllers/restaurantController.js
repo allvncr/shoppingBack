@@ -170,3 +170,76 @@ exports.deleteRestaurant = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+exports.addDishToMenu = async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant non trouvé" });
+    }
+
+    const { name, price, image } = req.body;
+
+    const newDish = { name, price, image };
+    restaurant.menu.push(newDish);
+
+    await restaurant.save();
+
+    res
+      .status(200)
+      .json({ message: "Plat ajouté au menu", menu: restaurant.menu });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de l'ajout du plat", error });
+  }
+};
+
+exports.removeDishFromMenu = async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant non trouvé" });
+    }
+
+    restaurant.menu = restaurant.menu.filter(
+      (dish) => dish._id.toString() !== req.params.dishId
+    );
+
+    await restaurant.save();
+
+    res
+      .status(200)
+      .json({ message: "Plat supprimé du menu", menu: restaurant.menu });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la suppression du plat", error });
+  }
+};
+
+exports.updateDishInMenu = async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant non trouvé" });
+    }
+
+    const dish = restaurant.menu.id(req.params.dishId);
+    if (!dish) {
+      return res.status(404).json({ message: "Plat non trouvé" });
+    }
+
+    const { name, price, image } = req.body;
+
+    if (name) dish.name = name;
+    if (price) dish.price = price;
+    if (image) dish.image = image;
+
+    await restaurant.save();
+
+    res.status(200).json({ message: "Plat mis à jour", dish });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour du plat", error });
+  }
+};
