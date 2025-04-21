@@ -12,6 +12,7 @@ exports.addToCart = async (req, res) => {
       reservationEndTime,
       people,
       price,
+      menu,
       additionalInfo,
     } = req.body;
 
@@ -36,6 +37,7 @@ exports.addToCart = async (req, res) => {
       reservationEndTime,
       people,
       price,
+      menu,
       additionalInfo,
     });
 

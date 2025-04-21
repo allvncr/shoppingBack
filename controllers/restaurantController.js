@@ -86,8 +86,7 @@ exports.getRestaurants = async (req, res) => {
 exports.getRestaurantBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-
-    const restaurant = await Restaurant.findOne(slug).populate(
+    const restaurant = await Restaurant.findOne({ slug }).populate(
       "createdBy",
       "firstname lastname email"
     );

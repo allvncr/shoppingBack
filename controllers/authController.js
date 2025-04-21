@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 require("dotenv").config();
+const sendEmail = require("../utils/sendEmail");
 
 // Inscription
 exports.register = async (req, res) => {
@@ -30,31 +31,51 @@ exports.register = async (req, res) => {
         .json({ message: "Numéro de téléphone déjà utilisé" });
     }
 
-    // Vérifier que les types d'établissements sont valides si fournis
+    // Vérifier les types d'établissements s'ils sont fournis
     const validTypes = ["Hotel", "Restaurant", "Activité", "Parking"];
     if (establishmentTypes) {
-      if (
-        !Array.isArray(establishmentTypes) ||
-        !establishmentTypes.every((type) => validTypes.includes(type))
-      ) {
+      const isValid =
+        Array.isArray(establishmentTypes) &&
+        establishmentTypes.every((type) => validTypes.includes(type));
+
+      if (!isValid) {
         return res
           .status(400)
           .json({ message: "Types d'établissements invalides" });
       }
     }
 
-    // Créer le nouvel utilisateur
+    // Créer et sauvegarder le nouvel utilisateur
     const newUser = new User({
       lastname,
       firstname,
-      email: email.toLowerCase(), // Normalisation de l'email
+      email: email.toLowerCase(),
       tel,
       password,
-      role: role || "client", // Par défaut, le rôle est "client"
-      establishmentTypes: establishmentTypes || [], // Vide par défaut si non fourni
+      role: role || "client",
+      establishmentTypes: establishmentTypes || [],
     });
 
     await newUser.save();
+    console.log("✅ Nouvel utilisateur créé :", newUser.email);
+
+    // Envoi de l'email de bienvenue
+    try {
+      await sendEmail({
+        to: newUser.email,
+        subject: "Bienvenue sur Reserv@babi !",
+        html: `
+          <h2>Bonjour ${firstname},</h2>
+          <p>Merci de votre inscription sur notre plateforme. Vous pouvez maintenant réserver vos établissements préférés !</p>
+          <p style="color: #444">— L'équipe Reserv@babi</p>
+        `,
+      });
+      console.log("📩 Email de confirmation envoyé à", newUser.email);
+    } catch (emailErr) {
+      console.error("❌ Échec de l'envoi de l'email :", emailErr.message);
+    }
+
+    // Réponse finale
     res.status(201).json({
       message: "Utilisateur créé avec succès",
       user: {
@@ -68,6 +89,7 @@ exports.register = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error("❌ Erreur dans register :", err);
     res.status(500).json({ message: "Erreur serveur", error: err.message });
   }
 };
