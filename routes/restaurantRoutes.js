@@ -19,7 +19,7 @@ const router = express.Router();
 router.get("/restaurants", getRestaurants);
 
 // Récupérer un restaurant par son ID ou slug
-router.get("/restaurants/:id", getRestaurantBySlug);
+router.get("/restaurants/:slug", getRestaurantBySlug);
 
 // Créer un restaurant
 router.post(

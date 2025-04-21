@@ -25,6 +25,13 @@ const reservationSchema = new mongoose.Schema(
         reservationEndDate: {
           type: Date,
           required: false,
+          validate: {
+            validator: function (value) {
+              if (!value || !this.reservationStartDate) return true;
+              return value >= this.reservationStartDate;
+            },
+            message: "La date de fin doit être postérieure à la date de début.",
+          },
         },
         reservationEndTime: {
           type: String,
@@ -33,6 +40,7 @@ const reservationSchema = new mongoose.Schema(
         people: {
           type: Number,
           required: false,
+          min: [1, "Le nombre de personnes doit être au moins 1."],
         },
         price: {
           type: Number,
@@ -42,6 +50,23 @@ const reservationSchema = new mongoose.Schema(
           type: String,
           required: false,
         },
+        menu: [
+          {
+            name: {
+              type: String,
+              required: true,
+            },
+            quantity: {
+              type: Number,
+              required: true,
+              default: 1,
+            },
+            price: {
+              type: Number,
+              required: true,
+            },
+          },
+        ],
       },
     ],
     totalPrice: {
