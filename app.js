@@ -11,6 +11,7 @@ const hotels = require("./routes/hotelRoutes");
 const parking = require("./routes/parkingRoutes");
 const cart = require("./routes/cartRoutes");
 const reservations = require("./routes/reservationRoutes");
+const payments = require("./routes/paymentRoutes");
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/establishments", parking);
 app.use("/api/favorites", favorite);
 app.use("/api/cart", cart);
 app.use("/api/reservations", reservations);
+app.use("/api/payment", payments);
 
 // Variables d'environnement
 const port = process.env.PORT || 3000;
