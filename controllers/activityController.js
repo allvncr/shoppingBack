@@ -2,15 +2,7 @@ const Activity = require("../models/Activity");
 
 // Création d'une activité
 exports.createActivity = async (req, res) => {
-  const {
-    name,
-    description,
-    location,
-    images,
-    contact,
-    price,
-    maxParticipants,
-  } = req.body;
+  const { name, description, location, images, contact, price } = req.body;
 
   try {
     if (!req.user) {
@@ -31,7 +23,6 @@ exports.createActivity = async (req, res) => {
       images,
       contact,
       price,
-      maxParticipants,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });
 

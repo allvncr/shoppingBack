@@ -6,10 +6,6 @@ const activitySchema = new mongoose.Schema({
     type: Number, // Exemple : 5000 (CFA)
     required: true,
   },
-  maxParticipants: {
-    type: Number, // Nombre maximum de participants
-    required: true,
-  },
 });
 
 const Activity = BaseEstablishment.discriminator("Activité", activitySchema);
