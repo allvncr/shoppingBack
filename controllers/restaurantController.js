@@ -139,9 +139,9 @@ exports.updateRestaurant = async (req, res) => {
 
 // Supprimer un restaurant
 exports.deleteRestaurant = async (req, res) => {
-  const { id } = req.params;
-
   try {
+    const { id } = req.params;
+
     // Vérifier si le restaurant existe
     const restaurant = await Restaurant.findById(id);
 
@@ -151,20 +151,19 @@ exports.deleteRestaurant = async (req, res) => {
 
     // Vérifier si l'utilisateur est autorisé à supprimer
     if (
-      String(restaurant.createdBy) !== String(req.user._id) &&
-      req.user.role !== "superAdmin"
+      req.user.role === "superAdmin" ||
+      restaurant.createdBy.toString() === req.user._id.toString()
     ) {
+      await Restaurant.findByIdAndDelete(id);
+      return res
+        .status(200)
+        .json({ message: "Restaurant supprimé avec succès" });
+    } else {
       return res.status(403).json({
-        message: "Vous n'êtes pas autorisé à supprimer ce restaurant.",
+        message:
+          "Accès refusé, vous n'êtes pas autorisé à supprimer ce restaurant",
       });
     }
-
-    // Supprimer le restaurant
-    await restaurant.remove();
-
-    res.status(200).json({
-      message: "Restaurant supprimé avec succès.",
-    });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }

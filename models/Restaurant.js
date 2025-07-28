@@ -19,7 +19,7 @@ const DishSchema = new mongoose.Schema({
 const restaurantSchema = new mongoose.Schema({
   cuisineType: {
     type: String,
-    required: true,
+    required: false,
   },
   openingHours: {
     start: { type: String, required: true },

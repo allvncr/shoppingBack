@@ -141,19 +141,17 @@ exports.deleteHotel = async (req, res) => {
     }
 
     if (
-      String(hotel.createdBy) !== String(req.user._id) &&
-      req.user.role !== "superAdmin"
+      req.user.role === "superAdmin" ||
+      hotel.createdBy.toString() === req.user._id.toString()
     ) {
+      await Hotel.findByIdAndDelete(id);
+      return res.status(200).json({ message: "Hôtel supprimée avec succès" });
+    } else {
       return res.status(403).json({
-        message: "Vous n'êtes pas autorisé à supprimer cet établissement.",
+        message:
+          "Accès refusé, vous n'êtes pas autorisé à supprimer cet établissement",
       });
     }
-
-    await hotel.remove();
-
-    res.status(200).json({
-      message: "Maison de vacance supprimée avec succès.",
-    });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
