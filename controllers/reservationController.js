@@ -65,7 +65,7 @@ exports.createReservation = async (req, res) => {
 
 exports.getReservationsByUser = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const reservations = await Reservation.find({ user: userId })
       .populate("items.establishment")
@@ -80,7 +80,7 @@ exports.getReservationsByUser = async (req, res) => {
 exports.cancelReservation = async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Vérification de l'existence de la réservation
     const reservation = await Reservation.findOne({
@@ -113,7 +113,7 @@ exports.cancelReservation = async (req, res) => {
 exports.confirmReservation = async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Vérification de l'existence de la réservation
     const reservation = await Reservation.findOne({
