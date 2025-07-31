@@ -53,6 +53,11 @@ exports.getRestaurants = async (req, res) => {
       filter.name = { $regex: name, $options: "i" };
     }
 
+    // Si un createdBy est fourni dans les paramètres, filtrer par ce propriétaire
+    if (createdBy) {
+      filter.createdBy = createdBy;
+    }
+
     if (city) {
       filter["location.city"] = city;
     }

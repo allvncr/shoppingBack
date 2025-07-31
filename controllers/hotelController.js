@@ -44,12 +44,18 @@ exports.createHotel = async (req, res) => {
 // Obtenir la liste des maisons de vacances avec filtres
 exports.getHotels = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, minCapacity } = req.query;
+    const { name, city, minPrice, maxPrice, minCapacity, createdBy } =
+      req.query;
 
     let filter = {};
 
     if (name) {
       filter.name = { $regex: name, $options: "i" };
+    }
+
+    // Si un createdBy est fourni dans les paramètres, filtrer par ce propriétaire
+    if (createdBy) {
+      filter.createdBy = createdBy;
     }
 
     if (city) {
