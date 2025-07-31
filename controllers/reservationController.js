@@ -80,12 +80,12 @@ exports.getReservationsByUser = async (req, res) => {
 exports.cancelReservation = async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const userId = req.user._id;
+    // const userId = req.user._id;
 
     // Vérification de l'existence de la réservation
     const reservation = await Reservation.findOne({
       _id: reservationId,
-      user: userId,
+      // user: userId,
     });
     if (!reservation) {
       return res.status(404).json({ message: "Réservation introuvable." });
@@ -113,12 +113,12 @@ exports.cancelReservation = async (req, res) => {
 exports.confirmReservation = async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const userId = req.user._id;
+    // const userId = req.user._id;
 
     // Vérification de l'existence de la réservation
     const reservation = await Reservation.findOne({
       _id: reservationId,
-      user: userId,
+      // user: userId,
     });
     if (!reservation) {
       return res.status(404).json({ message: "Réservation introuvable." });
