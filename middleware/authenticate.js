@@ -18,7 +18,7 @@ const authenticate = async (req, res, next) => {
     }
 
     // Vérifier si le rôle de l'utilisateur est valide
-    const validRoles = ["superAdmin", "proprio", "client"];
+    const validRoles = ["superAdmin", "proprio", "client", "admin"];
     if (!validRoles.includes(user.role)) {
       return res.status(403).json({ message: "Rôle utilisateur invalide" });
     }

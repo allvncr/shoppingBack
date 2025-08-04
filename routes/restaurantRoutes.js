@@ -25,7 +25,7 @@ router.get("/restaurants/:slug", getRestaurantBySlug);
 router.post(
   "/restaurants",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   createRestaurant
 );
 
@@ -33,7 +33,7 @@ router.post(
 router.patch(
   "/restaurants/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   updateRestaurant
 );
 
@@ -41,7 +41,7 @@ router.patch(
 router.delete(
   "/restaurants/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   deleteRestaurant
 );
 
@@ -49,7 +49,7 @@ router.delete(
 router.post(
   "/restaurants/:id/menu",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   addDishToMenu
 );
 
@@ -57,7 +57,7 @@ router.post(
 router.delete(
   "/restaurants/:id/menu/:dishId",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   removeDishFromMenu
 );
 
@@ -65,7 +65,7 @@ router.delete(
 router.patch(
   "/restaurants/:id/menu/:dishId",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   updateDishInMenu
 );
 

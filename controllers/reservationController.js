@@ -146,7 +146,7 @@ exports.confirmReservation = async (req, res) => {
 exports.getAllReservations = async (req, res) => {
   try {
     // Vérifie que c'est bien un superAdmin
-    if (req.user.role !== "superAdmin") {
+    if (req.user.role !== "superAdmin" || req.user.role !== "admin") {
       return res.status(403).json({ message: "Accès refusé" });
     }
 

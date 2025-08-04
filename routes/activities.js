@@ -21,7 +21,7 @@ router.get("/activities/:slug", getActivityBySlug);
 router.post(
   "/activities",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   createActivity
 );
 
@@ -29,7 +29,7 @@ router.post(
 router.patch(
   "/activities/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   updateActivity
 );
 
@@ -37,7 +37,7 @@ router.patch(
 router.delete(
   "/activities/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   deleteActivity
 );
 

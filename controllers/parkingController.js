@@ -121,7 +121,7 @@ exports.updateParking = async (req, res) => {
     // Vérifier si l'utilisateur est le propriétaire ou un superAdmin
     if (
       parking.createdBy.toString() !== req.user._id.toString() &&
-      req.user.role !== "superAdmin"
+      (req.user.role !== "superAdmin" || req.user.role !== "admin")
     ) {
       return res
         .status(403)
@@ -160,7 +160,7 @@ exports.deleteParking = async (req, res) => {
     // Vérifier si l'utilisateur est le propriétaire ou un superAdmin
     if (
       parking.createdBy.toString() !== req.user._id.toString() &&
-      req.user.role !== "superAdmin"
+      (req.user.role !== "superAdmin" || req.user.role !== "admin")
     ) {
       return res
         .status(403)

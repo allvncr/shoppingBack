@@ -21,7 +21,7 @@ router.get("/parkings/:slug", getParkingBySlug);
 router.post(
   "/parkings",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   createParking
 );
 
@@ -29,7 +29,7 @@ router.post(
 router.patch(
   "/parkings/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   updateParking
 );
 
@@ -37,7 +37,7 @@ router.patch(
 router.delete(
   "/parkings/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   deleteParking
 );
 

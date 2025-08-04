@@ -21,7 +21,7 @@ router.get("/hotels/:slug", getHotelBySlug);
 router.post(
   "/hotels",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   createHotel
 );
 
@@ -29,7 +29,7 @@ router.post(
 router.patch(
   "/hotels/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   updateHotel
 );
 
@@ -37,7 +37,7 @@ router.patch(
 router.delete(
   "/hotels/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   deleteHotel
 );
 

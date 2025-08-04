@@ -83,7 +83,7 @@ exports.updateActivity = async (req, res) => {
     }
 
     if (
-      req.user.role !== "superAdmin" &&
+      (req.user.role !== "superAdmin" || req.user.role !== "admin") &&
       String(activity.createdBy) !== String(req.user._id)
     ) {
       return res.status(403).json({
@@ -119,6 +119,7 @@ exports.deleteActivity = async (req, res) => {
 
     if (
       req.user.role === "superAdmin" ||
+      req.user.role === "admin" ||
       activity.createdBy.toString() === req.user._id.toString()
     ) {
       await Activity.findByIdAndDelete(id);

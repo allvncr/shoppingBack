@@ -116,7 +116,7 @@ exports.updateHotel = async (req, res) => {
 
     if (
       String(hotel.createdBy) !== String(req.user._id) &&
-      req.user.role !== "superAdmin"
+      (req.user.role !== "superAdmin" || req.user.role !== "admin")
     ) {
       return res.status(403).json({
         message: "Vous n'êtes pas autorisé à modifier cet établissement.",
@@ -148,6 +148,7 @@ exports.deleteHotel = async (req, res) => {
 
     if (
       req.user.role === "superAdmin" ||
+      req.user.role === "admin" ||
       hotel.createdBy.toString() === req.user._id.toString()
     ) {
       await Hotel.findByIdAndDelete(id);

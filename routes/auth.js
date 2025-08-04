@@ -28,14 +28,14 @@ router.put("/update", authenticate, updateUserInfo);
 router.patch(
   "/users/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   updateUserByID
 );
 
 router.delete(
   "/users/:id",
   authenticate,
-  checkRole("superAdmin", "proprio"),
+  checkRole("superAdmin", "admin", "proprio"),
   deleteUserByID
 );
 

@@ -122,7 +122,7 @@ exports.updateRestaurant = async (req, res) => {
     // Vérifier si l'utilisateur est autorisé à modifier
     if (
       String(restaurant.createdBy) !== String(req.user._id) &&
-      req.user.role !== "superAdmin"
+      (req.user.role !== "superAdmin" || req.user.role !== "admin")
     ) {
       return res.status(403).json({
         message: "Vous n'êtes pas autorisé à modifier ce restaurant.",
@@ -157,6 +157,7 @@ exports.deleteRestaurant = async (req, res) => {
     // Vérifier si l'utilisateur est autorisé à supprimer
     if (
       req.user.role === "superAdmin" ||
+      req.user.role === "admin" ||
       restaurant.createdBy.toString() === req.user._id.toString()
     ) {
       await Restaurant.findByIdAndDelete(id);

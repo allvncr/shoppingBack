@@ -32,7 +32,7 @@ router.put("/:reservationId/confirm", authenticate, confirmReservation);
 router.get(
   "/admin/all",
   authenticate,
-  checkRole("superAdmin"),
+  checkRole("superAdmin", "admin"),
   getAllReservations
 );
 
