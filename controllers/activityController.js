@@ -1,5 +1,17 @@
 const Activity = require("../models/Activity");
 
+exports.migrateActivitiesToStatutTrue = async (req, res) => {
+  try {
+    const result = await Activity.updateMany({}, { $set: { statut: true } });
+    res.status(200).json({
+      message: "Migration terminée : tous les statuts sont passés à true.",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
 // Création d'une activité
 exports.createActivity = async (req, res) => {
   const { name, description, location, images, contact, price } = req.body;
@@ -39,12 +51,18 @@ exports.createActivity = async (req, res) => {
 // Obtenir la liste des activités avec filtres
 exports.getActivities = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, createdBy } = req.query;
+    const { name, city, minPrice, maxPrice, createdBy, statut } = req.query;
 
-    let filter = {};
+    let filter = {
+      statut: true, // Par défaut, on ne récupère que les parkings actifs
+    };
 
     if (createdBy) {
       filter.createdBy = createdBy;
+    }
+
+    if (statut) {
+      delete filter.statut;
     }
 
     if (name) {

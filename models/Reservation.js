@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const reservationSchema = new mongoose.Schema(
   {
-    transactionId: { type: Number, unique: true },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -200,7 +200,7 @@ exports.getAllUsers = async (req, res) => {
     }
 
     // Vérifier si l'utilisateur est un administrateur
-    if (req.user.role !== "superAdmin" || req.user.role !== "admin") {
+    if (req.user.role !== "superAdmin" && req.user.role !== "admin") {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
@@ -228,7 +228,7 @@ exports.updateUserByID = async (req, res) => {
     }
 
     // Vérifier si l'utilisateur est un administrateur
-    if (req.user.role !== "superAdmin" || req.user.role !== "admin") {
+    if (req.user.role !== "superAdmin" && req.user.role !== "admin") {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
@@ -308,7 +308,7 @@ exports.deleteUserByID = async (req, res) => {
     }
 
     // Vérifier si l'utilisateur est un administrateur
-    if (req.user.role !== "superAdmin" || req.user.role !== "admin") {
+    if (req.user.role !== "superAdmin" && req.user.role !== "admin") {
       return res.status(403).json({ message: "Accès refusé" });
     }
 

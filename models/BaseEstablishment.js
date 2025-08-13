@@ -62,6 +62,10 @@ const baseEstablishmentSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    statut: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true, discriminatorKey: "type" }
 );

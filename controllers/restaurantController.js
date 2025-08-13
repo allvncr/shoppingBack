@@ -1,5 +1,17 @@
 const Restaurant = require("../models/Restaurant");
 
+exports.migrateRestaurantsToStatutTrue = async (req, res) => {
+  try {
+    const result = await Restaurant.updateMany({}, { $set: { statut: true } });
+    res.status(200).json({
+      message: "Migration terminée : tous les statuts sont passés à true.",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
 // Créer un restaurant
 exports.createRestaurant = async (req, res) => {
   const {
@@ -44,13 +56,28 @@ exports.createRestaurant = async (req, res) => {
 // Obtenir la liste des restaurants avec filtres
 exports.getRestaurants = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, cuisineType, startTime, endTime } =
-      req.query;
+    const {
+      name,
+      city,
+      minPrice,
+      maxPrice,
+      cuisineType,
+      startTime,
+      endTime,
+      createdBy,
+      statut,
+    } = req.query;
 
-    let filter = {};
+    let filter = {
+      statut: true, // Par défaut, on ne récupère que les parkings actifs
+    };
 
     if (name) {
       filter.name = { $regex: name, $options: "i" };
+    }
+
+    if (statut) {
+      delete filter.statut;
     }
 
     // Si un createdBy est fourni dans les paramètres, filtrer par ce propriétaire

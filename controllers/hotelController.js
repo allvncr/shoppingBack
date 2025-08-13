@@ -1,5 +1,17 @@
 const Hotel = require("../models/Hotel");
 
+exports.migrateHotelsToStatutTrue = async (req, res) => {
+  try {
+    const result = await Hotel.updateMany({}, { $set: { statut: true } });
+    res.status(200).json({
+      message: "Migration terminée : tous les statuts sont passés à true.",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
 // Créer une maison de vacance
 exports.createHotel = async (req, res) => {
   const {
@@ -44,10 +56,12 @@ exports.createHotel = async (req, res) => {
 // Obtenir la liste des maisons de vacances avec filtres
 exports.getHotels = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, minCapacity, createdBy } =
+    const { name, city, minPrice, maxPrice, minCapacity, createdBy, statut } =
       req.query;
 
-    let filter = {};
+    let filter = {
+      statut: true, // Par défaut, on ne récupère que les parkings actifs
+    };
 
     if (name) {
       filter.name = { $regex: name, $options: "i" };
@@ -56,6 +70,10 @@ exports.getHotels = async (req, res) => {
     // Si un createdBy est fourni dans les paramètres, filtrer par ce propriétaire
     if (createdBy) {
       filter.createdBy = createdBy;
+    }
+
+    if (statut) {
+      delete filter.statut;
     }
 
     if (city) {

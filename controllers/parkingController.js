@@ -1,5 +1,17 @@
 const Parking = require("../models/Parking");
 
+exports.migrateParkingsToStatutTrue = async (req, res) => {
+  try {
+    const result = await Parking.updateMany({}, { $set: { statut: true } });
+    res.status(200).json({
+      message: "Migration terminée : tous les statuts sont passés à true.",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
 // Créer un parking
 exports.createParking = async (req, res) => {
   const {
@@ -44,13 +56,27 @@ exports.createParking = async (req, res) => {
 // Obtenir la liste des parkings avec filtres
 exports.getParkings = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, startTime, endTime, createdBy } =
-      req.query;
+    const {
+      name,
+      city,
+      minPrice,
+      maxPrice,
+      startTime,
+      endTime,
+      createdBy,
+      statut,
+    } = req.query;
 
-    let filter = {};
+    let filter = {
+      statut: true, // Par défaut, on ne récupère que les parkings actifs
+    };
 
     if (name) {
       filter.name = { $regex: name, $options: "i" };
+    }
+
+    if (statut) {
+      delete filter.statut;
     }
 
     // Si un createdBy est fourni dans les paramètres, filtrer par ce propriétaire
