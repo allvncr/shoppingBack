@@ -5,10 +5,16 @@ const Parking = require("../models/Parking");
 
 exports.getAllEstablishments = async (req, res) => {
   try {
-    const { name, city, minPrice, maxPrice, type } = req.query;
+    const { name, city, minPrice, maxPrice, type, statut } = req.query;
 
     // Construire le filtre commun
-    let commonFilter = {};
+    let commonFilter = {
+      statut: true,
+    };
+
+    if (statut) {
+      delete filter.statut;
+    }
 
     if (name) {
       commonFilter.name = { $regex: name, $options: "i" }; // Recherche insensible à la casse
