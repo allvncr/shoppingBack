@@ -2,7 +2,10 @@ const Restaurant = require("../models/Restaurant");
 
 exports.migrateRestaurantsToStatutTrue = async (req, res) => {
   try {
-    const result = await Restaurant.updateMany({}, { $set: { statut: true } });
+    const result = await Restaurant.updateMany(
+      {},
+      { $set: { modele: "modele1" } }
+    );
     res.status(200).json({
       message: "Migration terminée : tous les statuts sont passés à true.",
       modifiedCount: result.modifiedCount,
@@ -23,6 +26,7 @@ exports.createRestaurant = async (req, res) => {
     cuisineType,
     openingHours,
     amenities,
+    modele,
   } = req.body;
 
   try {
@@ -39,6 +43,7 @@ exports.createRestaurant = async (req, res) => {
       cuisineType,
       openingHours,
       amenities,
+      modele,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });
 

@@ -10,6 +10,7 @@ const restaurants = require("./routes/restaurantRoutes");
 const hotels = require("./routes/hotelRoutes");
 const parking = require("./routes/parkingRoutes");
 const finances = require("./routes/financeRoutes");
+const statistiques = require("./routes/statistiqueRoutes");
 const cart = require("./routes/cartRoutes");
 const reservations = require("./routes/reservationRoutes");
 const payments = require("./routes/paymentRoutes");
@@ -33,6 +34,7 @@ app.use("/api/favorites", favorite);
 app.use("/api/finances", finances);
 app.use("/api/cart", cart);
 app.use("/api/reservations", reservations);
+app.use("/api/statistiques", statistiques);
 app.use("/api/payment", payments);
 
 // Variables d'environnement

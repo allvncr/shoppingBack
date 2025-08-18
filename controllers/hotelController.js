@@ -2,7 +2,7 @@ const Hotel = require("../models/Hotel");
 
 exports.migrateHotelsToStatutTrue = async (req, res) => {
   try {
-    const result = await Hotel.updateMany({}, { $set: { statut: true } });
+    const result = await Hotel.updateMany({}, { $set: { modele: "modele1" } });
     res.status(200).json({
       message: "Migration terminée : tous les statuts sont passés à true.",
       modifiedCount: result.modifiedCount,
@@ -23,6 +23,7 @@ exports.createHotel = async (req, res) => {
     amenities,
     pricePerNight,
     capacity,
+    modele,
   } = req.body;
 
   try {
@@ -39,6 +40,7 @@ exports.createHotel = async (req, res) => {
       amenities,
       pricePerNight,
       capacity,
+      modele,
       createdBy: req.user._id,
     });
 

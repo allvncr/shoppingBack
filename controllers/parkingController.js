@@ -2,7 +2,10 @@ const Parking = require("../models/Parking");
 
 exports.migrateParkingsToStatutTrue = async (req, res) => {
   try {
-    const result = await Parking.updateMany({}, { $set: { statut: true } });
+    const result = await Parking.updateMany(
+      {},
+      { $set: { modele: "modele1" } }
+    );
     res.status(200).json({
       message: "Migration terminée : tous les statuts sont passés à true.",
       modifiedCount: result.modifiedCount,
@@ -23,6 +26,7 @@ exports.createParking = async (req, res) => {
     pricePerHour,
     openingHours,
     amenities,
+    modele,
   } = req.body;
 
   try {
@@ -39,6 +43,7 @@ exports.createParking = async (req, res) => {
       pricePerHour,
       openingHours,
       amenities,
+      modele,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });
 

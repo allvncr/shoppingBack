@@ -66,6 +66,11 @@ const baseEstablishmentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    modele: {
+      type: String,
+      enum: ["modele1", "modele2", "modele3"],
+      default: "modele1",
+    },
   },
   { timestamps: true, discriminatorKey: "type" }
 );

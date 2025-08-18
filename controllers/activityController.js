@@ -2,7 +2,10 @@ const Activity = require("../models/Activity");
 
 exports.migrateActivitiesToStatutTrue = async (req, res) => {
   try {
-    const result = await Activity.updateMany({}, { $set: { statut: true } });
+    const result = await Activity.updateMany(
+      {},
+      { $set: { modele: "modele1" } }
+    );
     res.status(200).json({
       message: "Migration terminée : tous les statuts sont passés à true.",
       modifiedCount: result.modifiedCount,
@@ -14,7 +17,8 @@ exports.migrateActivitiesToStatutTrue = async (req, res) => {
 
 // Création d'une activité
 exports.createActivity = async (req, res) => {
-  const { name, description, location, images, contact, price } = req.body;
+  const { name, description, location, images, contact, price, modele } =
+    req.body;
 
   try {
     if (!req.user) {
@@ -35,6 +39,7 @@ exports.createActivity = async (req, res) => {
       images,
       contact,
       price,
+      modele,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });
 
