@@ -8,6 +8,7 @@ const {
 } = require("../controllers/parkingController");
 const authenticate = require("../middleware/authenticate");
 const checkRole = require("../middleware/checkRole"); // Importer le middleware
+const upload = require("../middlewares/upload");
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.post(
   "/parkings",
   authenticate,
   checkRole("superAdmin", "admin", "proprio"),
+  upload.array("images", 10), // max 10 images
   createParking
 );
 

@@ -17,27 +17,24 @@ exports.migrateActivitiesToStatutTrue = async (req, res) => {
 
 // Création d'une activité
 exports.createActivity = async (req, res) => {
-  const { name, description, location, images, contact, price, modele } =
-    req.body;
+  const { name, description, location, contact, price, modele } = req.body;
 
   try {
     if (!req.user) {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
 
-    // Validation supplémentaire
-    if (!name || !location || !contact) {
-      return res
-        .status(400)
-        .json({ message: "Veuillez remplir tous les champs obligatoires." });
-    }
+    // Si des fichiers sont uploadés, on génère les chemins
+    const imagePaths = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
 
     const newActivity = new Activity({
       name,
       description,
-      location,
-      images,
-      contact,
+      location: JSON.parse(location), // attendu comme JSON string depuis frontend
+      contact: JSON.parse(contact), // idem
+      images: imagePaths, // maintenant ce sont les fichiers uploadés
       price,
       modele,
       createdBy: req.user._id, // Associer l'utilisateur connecté

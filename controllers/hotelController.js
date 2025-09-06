@@ -12,45 +12,50 @@ exports.migrateHotelsToStatutTrue = async (req, res) => {
   }
 };
 
-// Créer une maison de vacance
+// Créer un hôtel (maison de vacance)
 exports.createHotel = async (req, res) => {
-  const {
-    name,
-    description,
-    location,
-    images,
-    contact,
-    amenities,
-    pricePerNight,
-    capacity,
-    modele,
-  } = req.body;
-
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Utilisateur non authentifié" });
-    }
-
-    const newHotel = new Hotel({
+    const {
       name,
       description,
       location,
-      images,
       contact,
       amenities,
       pricePerNight,
       capacity,
       modele,
+    } = req.body;
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    // Si des fichiers sont uploadés, on génère les chemins
+    const imagePaths = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
+    const newHotel = new Hotel({
+      name,
+      description,
+      location: JSON.parse(location), // attendu comme JSON string depuis frontend
+      contact: JSON.parse(contact), // idem
+      amenities: amenities ? amenities.split(",") : [],
+      pricePerNight,
+      capacity,
+      modele,
+      images: imagePaths, // maintenant ce sont les fichiers uploadés
       createdBy: req.user._id,
     });
 
     await newHotel.save();
 
     res.status(201).json({
-      message: "Maison de vacance créée avec succès",
+      message: "Hôtel créé avec succès",
       hotel: newHotel,
     });
   } catch (error) {
+    console.error("Erreur création hôtel:", error);
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };

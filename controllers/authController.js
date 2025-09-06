@@ -1,8 +1,10 @@
+const axios = require("axios");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 require("dotenv").config();
 const sendEmail = require("../utils/sendEmail");
+const qs = require("qs");
 
 // Inscription
 exports.register = async (req, res) => {
@@ -97,6 +99,7 @@ exports.register = async (req, res) => {
 // Connexion
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     // Recherche de l'utilisateur par email (insensible à la casse)
     const user = await User.findOne({
@@ -120,7 +123,13 @@ exports.login = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    // Renvoi des données utilisateur (sans le mot de passe)
+    // Vérification si l'utilisateur est un admin ou superAdmin
+    let cinetPayToken = null; // Initialisation de la variable du token CinetPay
+    if (user.role === "admin" || user.role === "superAdmin") {
+      cinetPayToken = await getCinetPayToken(); // Connexion à CinetPay si admin ou superAdmin
+    }
+
+    // Renvoi des données utilisateur (sans le mot de passe) et du token JWT
     res.status(200).json({
       token,
       user: {
@@ -132,9 +141,43 @@ exports.login = async (req, res) => {
         role: user.role,
         establishmentTypes: user.establishmentTypes || [], // Inclure les types
       },
+      cinetPayToken, // Inclure le token CinetPay si admin ou superAdmin
     });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur", error: err.message });
+  }
+};
+
+const getCinetPayToken = async () => {
+  const url = "https://client.cinetpay.com/v1/auth/login";
+
+  // Paramètres pour la requête d'authentification
+  const params = qs.stringify({
+    apikey: "83174733365f9bc0979b506.44460846", // Remplacez par votre clé API
+    password: "ReservaBabi2025!", // Remplacez par votre mot de passe API
+    lang: "fr", // Langue (fr ou en)
+  });
+
+  try {
+    console.log(params);
+    const response = await axios.post(url, params, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+
+    // Vérification du code de réponse de l'API
+    if (response.data.code === 0) {
+      console.log("Token CinetPay généré avec succès!");
+      return response.data.data.token; // Retourner le token CinetPay
+    } else {
+      console.error("Erreur CinetPay:", response.data.message);
+      throw new Error(response.data.message);
+    }
+  } catch (error) {
+    console.error(
+      "Erreur de connexion à CinetPay:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error("Erreur lors de la génération du token CinetPay");
   }
 };
 

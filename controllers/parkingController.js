@@ -34,15 +34,20 @@ exports.createParking = async (req, res) => {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
 
+    // Si des fichiers sont uploadés, on génère les chemins
+    const imagePaths = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
     const newParking = new Parking({
       name,
       description,
-      location,
-      images,
-      contact,
+      location: JSON.parse(location), // attendu comme JSON string depuis frontend
+      contact: JSON.parse(contact), // idem
+      amenities: amenities ? amenities.split(",") : [],
+      images: imagePaths, // maintenant ce sont les fichiers uploadés
       pricePerHour,
       openingHours,
-      amenities,
       modele,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });

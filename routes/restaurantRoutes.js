@@ -12,6 +12,7 @@ const {
 
 const authenticate = require("../middleware/authenticate");
 const checkRole = require("../middleware/checkRole");
+const upload = require("../middlewares/upload");
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ router.post(
   "/restaurants",
   authenticate,
   checkRole("superAdmin", "admin", "proprio"),
+  upload.array("images", 10), // max 10 images
   createRestaurant
 );
 

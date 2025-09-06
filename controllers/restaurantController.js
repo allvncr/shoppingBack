@@ -21,7 +21,6 @@ exports.createRestaurant = async (req, res) => {
     name,
     description,
     location,
-    images,
     contact,
     cuisineType,
     openingHours,
@@ -34,15 +33,20 @@ exports.createRestaurant = async (req, res) => {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
 
+    // Si des fichiers sont uploadés, on génère les chemins
+    const imagePaths = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
     const newRestaurant = new Restaurant({
       name,
       description,
-      location,
-      images,
-      contact,
+      location: JSON.parse(location), // attendu comme JSON string depuis frontend
+      contact: JSON.parse(contact), // idem
+      amenities: amenities ? amenities.split(",") : [],
+      images: imagePaths, // maintenant ce sont les fichiers uploadés
       cuisineType,
       openingHours,
-      amenities,
       modele,
       createdBy: req.user._id, // Associer l'utilisateur connecté
     });

@@ -8,6 +8,7 @@ const {
 } = require("../controllers/hotelController");
 const authenticate = require("../middleware/authenticate");
 const checkRole = require("../middleware/checkRole");
+const upload = require("../middlewares/upload");
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.post(
   "/hotels",
   authenticate,
   checkRole("superAdmin", "admin", "proprio"),
+  upload.array("images", 10), // max 10 images
   createHotel
 );
 

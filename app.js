@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
@@ -36,6 +37,8 @@ app.use("/api/cart", cart);
 app.use("/api/reservations", reservations);
 app.use("/api/statistiques", statistiques);
 app.use("/api/payment", payments);
+// Dossier statique pour servir les images uploadées
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Variables d'environnement
 const port = process.env.PORT || 3000;
