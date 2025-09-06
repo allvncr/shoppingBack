@@ -8,7 +8,7 @@ const {
 } = require("../controllers/hotelController");
 const authenticate = require("../middleware/authenticate");
 const checkRole = require("../middleware/checkRole");
-const upload = require("../middlewares/upload");
+const upload = require("../middleware/upload");
 
 const router = express.Router();
 

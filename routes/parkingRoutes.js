@@ -8,7 +8,7 @@ const {
 } = require("../controllers/parkingController");
 const authenticate = require("../middleware/authenticate");
 const checkRole = require("../middleware/checkRole"); // Importer le middleware
-const upload = require("../middlewares/upload");
+const upload = require("../middleware/upload");
 
 const router = express.Router();
 
